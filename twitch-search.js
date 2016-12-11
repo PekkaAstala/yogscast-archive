@@ -2,6 +2,44 @@
 
 let https = require('https')
 
+let listVideos = (channel, accumulator, offset, callback) => {
+    https.request({
+        host: "api.twitch.tv",
+        path: "/kraken/channels/" + channel + "/videos" +
+            "?limit=100" +
+            "&broadcasts=true" +
+            "&offset=" + offset,
+        headers: {
+            "Client-ID": process.env.TWITCH_CLIENT_ID
+        }
+    },
+    function(response) {
+        let str = ''
+        response.on('data', chunk => str += chunk)
+        response.on('end', evt => {
+            let result = JSON.parse(str)
+
+            let data = accumulator.concat(result.videos)
+
+            if (offset + 100 >= result._total) {
+                callback(data)
+            }
+            else {
+                listVideos(channel, data, offset + 100, callback)
+            }
+        })
+    }).
+    end()
+}
+
+let videoDataReducer = data => {
+    return {
+        "title": data.title,
+        "url": data.url,
+        "game": data.game
+    }
+}
+
 exports.handler = (event, context, callback) => {
 
     const done = (err, res) => callback(null, {
@@ -12,35 +50,7 @@ exports.handler = (event, context, callback) => {
         },
     })
 
-    let twitchReqParams = {
-        host: "api.twitch.tv",
-        path: "/kraken/channels/yogscast/videos" +
-            "?limit=100" +
-            "&broadcasts=true" +
-            "&offset=800",
-        headers: {
-            "Client-ID": process.env.TWITCH_CLIENT_ID
-        }
-    }
-
-    let resultReducer = element => {
-        return {
-            "title": element.title,
-            "url": element.url
-        }
-    }
-
-    let twitchCallback = function(response) {
-      let str = ''
-
-      response.on('data', function (chunk) {
-        str += chunk
-      });
-
-      response.on('end', function () {
-          done(null, JSON.parse(str).videos.map(resultReducer))
-      })
-    }
-
-    https.request(twitchReqParams, twitchCallback).end()
+    listVideos("yogscast", [], 0, list => {
+        done(null, list.map(videoDataReducer))
+    })
 }
