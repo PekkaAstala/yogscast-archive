@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>Yogscast Archive</title>
+
+        <script src="https://code.jquery.com/jquery-3.1.1.min.js" integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8=" crossorigin="anonymous"></script>
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+        <script type="text/javascript" src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    </head>
+    <body>
+        <div class="container">
+            <div class="row text-center">
+                <div class="col-md-12">
+                    <h1>Yogscast Archive</h1>
+                </div>
+            </div>
+            <div class="row text-center">
+                <div class="col-md-12">
+                    <p>
+                        A 100% unofficial service for browsing Yogscast content.
+                    </p>
+                </div>
+            </div>
+            <div class="row text-center">
+                <div class="col-md-12">
+                    <form id="searchForm">
+                        <input type="text" id="searchString" /> <input type="submit" id="searchButton" value="Search" />
+                    </form>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <h2 class="text-center">Youtube results</h2>
+                    <ul id="resultsYoutube" >
+
+                    </ul>
+                </div>
+                <div class="col-md-6">
+                    <h2 class="text-center">Twitch results</h2>
+                    <ul id="resultsTwitch">
+
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <script type="text/javascript">
+            let youtubeQuery = (searchTerm) => {
+                $('#resultsYoutube').empty()
+
+                $.ajax("https://mv9kyxvjs4.execute-api.eu-central-1.amazonaws.com/prod/yogscast-archive-youtube")
+                 .then(response => {
+                     response.forEach(item => {
+                         $('#resultsYoutube').append($("<li><a href=\"" + item.url + "\">" + item.title + " </a></li>" ))
+                     })
+                 })
+            }
+
+            let twitchQuery = (searchTerm) => {
+                $('#resultsTwitch').empty()
+
+                $.ajax("https://mv9kyxvjs4.execute-api.eu-central-1.amazonaws.com/prod/yogscast-archive-twitch")
+                 .then(response => {
+                     response
+                     .filter(item => {
+                         return item.title.includes(searchTerm) ||
+                          (item.game && item.game.includes(searchTerm))
+                     })
+                     .forEach(item => {
+                         $('#resultsTwitch').append($("<li><a href=\"" + item.url + "\">" + item.title + " </a></li>" ))
+                     })
+                 })
+            }
+
+            $('document').ready(readyEvt => {
+                $('#searchForm').on('submit', function(evt) {
+                    evt.preventDefault()
+                    let searchTerm = $('#searchString')[0].value
+                    youtubeQuery(searchTerm)
+                    twitchQuery(searchTerm)
+                })
+            })
+        </script>
+    </body>
+</html>
