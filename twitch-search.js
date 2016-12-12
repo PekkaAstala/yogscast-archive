@@ -36,7 +36,9 @@ let videoDataReducer = data => {
     return {
         "title": data.title,
         "url": data.url,
-        "game": data.game
+        "game": data.game,
+        "thumbnail": data.preview,
+        "date": data.recorded_at
     }
 }
 

@@ -33,7 +33,9 @@ exports.handler = (event, context, callback) => {
     let resultReducer = element => {
         return {
             "title": element.snippet.title,
-            "url": "https://www.youtube.com/watch?v=" + element.id.videoId
+            "url": "https://www.youtube.com/watch?v=" + element.id.videoId,
+            "thumbnail": element.snippet.thumbnails.medium.url,
+            "date": element.snippet.publishedAt
         }
     }
 
