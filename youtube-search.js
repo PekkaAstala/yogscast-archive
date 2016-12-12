@@ -22,6 +22,7 @@ exports.handler = (event, context, callback) => {
         host: "content.googleapis.com",
         path: "/youtube/v3/search" +
             "?q=" + encodeURIComponent(queryString) +
+            "&maxResults=50" +
             "&safeSearch=none" +
             "&order=relevance" +
             "&channelId=UCH-_hzb2ILSCo9ftVSnrCIQ" +
