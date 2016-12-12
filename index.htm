@@ -7,6 +7,19 @@
         <script src="https://code.jquery.com/jquery-3.1.1.min.js" integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8=" crossorigin="anonymous"></script>
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
         <script type="text/javascript" src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+        <style type="text/css">
+            li {
+                list-style-type: none;
+                margin: 1em 0;
+            }
+            li img {
+                object-fit: none;
+                object-position: center;
+                height: 180px;
+                width: 320px;
+            }
+        </style>
     </head>
     <body>
         <div class="container">
@@ -32,7 +45,7 @@
             <div class="row">
                 <div class="col-md-6">
                     <h2 class="text-center">Youtube results</h2>
-                    <p>
+                    <p class="text-center">
                         50 most relevant results from Yogscast channel
                     </p>
                     <ul id="resultsYoutube" >
@@ -41,7 +54,7 @@
                 </div>
                 <div class="col-md-6">
                     <h2 class="text-center">Twitch results</h2>
-                    <p>
+                    <p class="text-center">
                         All broadcasts containing the query in title or game name
                     </p>
                     <ul id="resultsTwitch">
@@ -52,13 +65,17 @@
         </div>
 
         <script type="text/javascript">
+            let buildResultDOM = data => {
+                return $('<li class="text-center"><img src="' + data.thumbnail + '" /><br /><a href="' + data.url + '"> '+ data.title +'</a></li>')
+            }
+
             let youtubeQuery = (searchTerm) => {
                 $('#resultsYoutube').empty()
 
                 $.ajax("https://mv9kyxvjs4.execute-api.eu-central-1.amazonaws.com/prod/yogscast-archive-youtube?q=" + encodeURIComponent(searchTerm))
                  .then(response => {
                      response.forEach(item => {
-                         $('#resultsYoutube').append($("<li><a href=\"" + item.url + "\">" + item.title + " </a></li>" ))
+                         $('#resultsYoutube').append(buildResultDOM(item))
                      })
                  })
             }
@@ -80,7 +97,7 @@
                           (item.game && item.game.toLowerCase().includes(searchTerm))
                      })
                      .forEach(item => {
-                         $('#resultsTwitch').append($("<li><a href=\"" + item.url + "\">" + item.title + " </a></li>" ))
+                         $('#resultsTwitch').append(buildResultDOM(item))
                      })
                  })
             }
