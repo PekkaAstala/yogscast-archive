@@ -9,13 +9,19 @@ exports.handler = (event, context, callback) => {
         body: err ? ':(' : JSON.stringify(res),
         headers: {
             'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': '*'
         },
     })
+
+    let queryString = event.queryStringParameters.q;
+    if (!queryString) {
+        done(null, [])
+    }
 
     let youtubeReqParams = {
         host: "content.googleapis.com",
         path: "/youtube/v3/search" +
-            "?q=terraria" +
+            "?q=" + encodeURIComponent(queryString) +
             "&safeSearch=none" +
             "&order=relevance" +
             "&channelId=UCH-_hzb2ILSCo9ftVSnrCIQ" +

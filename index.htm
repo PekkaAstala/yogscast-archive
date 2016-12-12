@@ -49,7 +49,7 @@
             let youtubeQuery = (searchTerm) => {
                 $('#resultsYoutube').empty()
 
-                $.ajax("https://mv9kyxvjs4.execute-api.eu-central-1.amazonaws.com/prod/yogscast-archive-youtube")
+                $.ajax("https://mv9kyxvjs4.execute-api.eu-central-1.amazonaws.com/prod/yogscast-archive-youtube?q=" + encodeURIComponent(searchTerm))
                  .then(response => {
                      response.forEach(item => {
                          $('#resultsYoutube').append($("<li><a href=\"" + item.url + "\">" + item.title + " </a></li>" ))
@@ -60,12 +60,18 @@
             let twitchQuery = (searchTerm) => {
                 $('#resultsTwitch').empty()
 
+                if (!searchTerm) {
+                    return
+                }
+
                 $.ajax("https://mv9kyxvjs4.execute-api.eu-central-1.amazonaws.com/prod/yogscast-archive-twitch")
                  .then(response => {
                      response
                      .filter(item => {
-                         return item.title.includes(searchTerm) ||
-                          (item.game && item.game.includes(searchTerm))
+                         searchTerm = searchTerm.toLowerCase()
+
+                         return item.title.toLowerCase().includes(searchTerm) ||
+                          (item.game && item.game.toLowerCase().includes(searchTerm))
                      })
                      .forEach(item => {
                          $('#resultsTwitch').append($("<li><a href=\"" + item.url + "\">" + item.title + " </a></li>" ))
